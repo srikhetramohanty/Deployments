@@ -1,0 +1,22 @@
+<html>
+<head>
+<script>
+</script>
+    <body id='body'>
+    <body style="background-color:powderblue;">
+    </body>
+        <body>
+               <h1>Upload a CSV File to Predict Insurance Fraud</h1>
+
+            <form action="/predict" method="POST" enctype="multipart/form-data">
+                <input type="file" name="data_file" class="btn btn-block"/>
+                <input type="submit" class="btn btn-primary btn-block btn-large">Predict</button>
+            </form>
+			<p>{{ pred }}</p>
+			{% for table in tables %}
+					{{titles[loop.index]}}
+					{{ table|safe }}
+			{% endfor %}
+        </body>
+    </html>
+</html
