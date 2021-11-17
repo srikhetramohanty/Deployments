@@ -29,13 +29,13 @@ def predict():
     return render_template('home.html',pred='Shape of dataset {}'.format(data.shape), tables=[data.to_html(classes='data')], titles=data.columns.values)
     
     
-@app.route('/predict_api',methods=['POST'])
-def predict_api():
-    data = request.get_json(force=True)
-    data_unseen = pd.DataFrame([data])
-    prediction = predict_model(model, data=data_unseen)
-    output = prediction.Label[0]
-    return jsonify(output)
+# @app.route('/predict_api',methods=['POST'])
+# def predict_api():
+#     data = request.get_json(force=True)
+#     data_unseen = pd.DataFrame([data])
+#     prediction = predict_model(model, data=data_unseen)
+#     output = prediction.Label[0]
+#     return jsonify(output)
     
 if __name__ == '__main__':
     app.run(debug=True)
