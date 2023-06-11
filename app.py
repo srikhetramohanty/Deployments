@@ -5,9 +5,6 @@ from flask import Flask, jsonify, request, render_template
 from torchvision import models, transforms
 from PIL import Image
 import torch
-import base64
-from PIL import Image
-import io
 
 app = Flask(__name__)
 
@@ -23,31 +20,16 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
-
-# Convert base64 to PIL image
-def base64_to_pil_image(base64_image):
-    # Decode the base64 image to bytes
-    image_bytes = base64.b64decode(base64_image)
-
-    # Create a BytesIO stream from the image bytes
-    image_stream = io.BytesIO(image_bytes)
-
-    # Open the image stream using PIL
-    pil_image = Image.open(image_stream)
-
-    return pil_image
-
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
         # get the uploaded image from the form
-        ##img = request.files['image']
+        img = request.files['image']
         #print("reached here")
-        img = request.get_json()["image"]
+        #img = request.get_json()["image"]
         #print(img)
         # open and transform the image
-        #img = Image.open(img)
-        img = base64_to_pil_image(base64_image=img)
+        img = Image.open(img)
         img_tensor = transform(img)
 
         # add batch dimension to the image
@@ -66,5 +48,5 @@ def home():
     # return a JSON response with the predicted class label
     return render_template('home.html')
 
-#if __name__ == '__main__':
-app.run(host="0.0.0.0",port="5000",debug=True)
+if __name__ == '__main__':
+    app.run(host="0.0.0.0",port="5000",debug=True)
