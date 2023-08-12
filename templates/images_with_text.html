@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Images with Text</title>
+</head>
+<body>
+    {% for img_base64, description in images_and_descriptions %}
+    <div>
+        <img src="data:image/jpeg;base64,{{ img_base64 }}" alt="{{ description }}">
+        <p>{{ description }}</p>
+    </div>
+    {% endfor %}
+</body>
+</html>
