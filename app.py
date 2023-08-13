@@ -40,7 +40,7 @@ class VideoCamera:
             return b''
 
 camera = VideoCamera()
-
+####
 @app.route('/')
 def index():
     return render_template('home.html')
