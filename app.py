@@ -146,7 +146,8 @@ def home():
         #image = Image.open(image_path)
 
         # Draw bounding boxes on the image
-        output_image = draw_bboxes_on_image(img, results_dictionary)
+        img_resized= img.resize((640,640))
+        output_image = draw_bboxes_on_image(img_resized, results_dictionary)
         
         # Convert PIL image to bytes
         #img_byte_array = io.BytesIO()
@@ -157,7 +158,10 @@ def home():
         #img.save(img2_byte_array, format='JPEG')
         #img2_byte_array.seek(0)
         # Convert images to base64-encoded strings
-        img1_base64 = image_to_base64(img)
+        
+       
+        
+        img1_base64 = image_to_base64(img_resized)
         img2_base64 = image_to_base64(output_image)
         
         images_list = [img1_base64,img2_base64]

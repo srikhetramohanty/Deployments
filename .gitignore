@@ -1,1 +1,5 @@
 __pycache__/
+requirements.txt.bak
+app.py.bak
+Dockerfile.bak
+templates/images_with_text.html.bak
