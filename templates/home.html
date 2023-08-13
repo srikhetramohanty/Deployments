@@ -1,13 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Image Uploader</title>
+    <title>Video with Object Detection</title>
 </head>
 <body>
-    <h1>Image Uploader</h1>
-    <form method="POST" enctype="multipart/form-data">
-        <input type="file" name="image">
-        <input type="submit" value="Upload">
-    </form>
+    <h1>Video with Object Detection</h1>
+    <img src="{{ url_for('video_feed') }}" width="640" height="480">
 </body>
 </html>
