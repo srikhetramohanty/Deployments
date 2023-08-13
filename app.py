@@ -8,6 +8,7 @@ app = Flask(__name__)
 # Load a pretrained YOLOv8n model
 model = YOLO('yolov8n.pt')
 print('Model loaded....')
+###
 
 class VideoCamera:
     def __init__(self):
