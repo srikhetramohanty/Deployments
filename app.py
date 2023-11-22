@@ -9,6 +9,11 @@ import json
 from PIL import Image, ImageDraw, ImageFont
 import io
 import base64
+from minio import Minio
+from minio.error import S3Error
+import zipfile
+import os
+import shutil
 
 
 app = Flask(__name__)
@@ -18,6 +23,32 @@ def image_to_base64(image):
     image.save(img_byte_array, format='JPEG')
     img_byte_array.seek(0)
     return base64.b64encode(img_byte_array.read()).decode()
+
+
+def unzip_file(zip_path, extract_to):
+    """
+    Unzips a zip file to a specified directory, overwriting any existing content.
+
+    :param zip_path: The path to the zip file.
+    :param extract_to: The directory to extract the files to.
+    """
+    # Check if the ZIP file exists
+    if not os.path.exists(zip_path):
+        print(f"Error: The file {zip_path} does not exist.")
+        return
+
+    # Delete the target directory if it exists
+    if os.path.exists(extract_to):
+        shutil.rmtree(extract_to)
+        print(f"Existing directory {extract_to} removed.")
+
+    # Create the target directory
+    os.makedirs(extract_to)
+
+    # Unzipping process
+    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+        zip_ref.extractall(extract_to)
+        print(f"Files extracted to: {extract_to}")
 
 def draw_bboxes_on_image(image, bbox_predictions):
     # Create a copy of the input image to avoid modifying the original image
@@ -174,6 +205,58 @@ def home():
 
     # return a JSON response with the predicted class label
     return render_template('home.html')
+
+@app.route('/upload-zip', methods=['POST'])
+def upload_zip():
+
+    # Create a MinIO client
+    client = Minio(
+        "13.126.220.115:9000",
+        access_key="kZmyHyr1BvhE9pqi5pWu",
+        secret_key="m98OKv6KSpBVNqqsAg19Qa1ObFT0L0jdSFQyFHdp",
+        secure=False  # Set to False if not using https
+    )
+    if 'zipped_file' not in request.files:
+        return jsonify({"error": "No file part"})
+
+    file = request.files['zipped_file']
+    if file.filename == '':
+        return jsonify({"error": "No selected file"})
+
+    if file:
+        bucket_name = "vcc-project"
+        object_name = file.filename
+
+        # Ensure bucket exists
+        if not client.bucket_exists(bucket_name):
+            client.make_bucket(bucket_name)
+
+        # Save file to a temporary location
+        temp_file_path = "./" + object_name
+        file.save(temp_file_path)
+
+        # Upload the file
+        try:
+            client.fput_object(bucket_name, object_name, temp_file_path)
+            unzip_file(temp_file_path, "./data")
+
+            # Load a model
+            model = YOLO('yolov8n.yaml')  # build a new model from YAML
+            model = YOLO('yolov8n.pt')  # load a pretrained model (recommended for training)
+            model = YOLO('yolov8n.yaml').load('yolov8n.pt')  # build from YAML and transfer weights
+
+            # # Train the model
+            # results = model.train(data='./data/data.yaml',
+            #                     epochs=2, imgsz=640)
+                    
+            return jsonify({"message": f"File {object_name} uploaded successfully, training started"})
+        except Exception as e:
+            return jsonify({"error": str(e)})
+        
+    #############################################################   
+    
+
+    return jsonify({"error": "An error occurred"})
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0",port="5000",debug=True)

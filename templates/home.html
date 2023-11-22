@@ -4,10 +4,16 @@
     <title>Image Uploader</title>
 </head>
 <body>
-    <h1>Image Uploader</h1>
+    <h1>Inference on yolov8n</h1>
     <form method="POST" enctype="multipart/form-data">
         <input type="file" name="image">
-        <input type="submit" value="Upload">
+        <input type="submit" value="Run Inference">
     </form>
+    <h1>Retraining yolov8n with transfer learning</h1>
+    <form action="/upload-zip" method="post" enctype="multipart/form-data">
+        <input type="file" name="zipped_file">
+        <input type="submit" value="Upload data in yolov8 format">
+    </form>
+    
 </body>
 </html>
