@@ -138,8 +138,7 @@ def home():
         # get the uploaded image from the form
         img = request.files['image']
         #print("reached here")
-        #img = request.get_json()["image"]
-        #print(img)
+        
         #open and transform the image
         img = Image.open(img)
         img_tensor = transform(img)
@@ -148,49 +147,19 @@ def home():
         img_tensor = img_tensor.unsqueeze(0)
 
         ##########################################
-
-
         # Define path to the image file
         source = img_tensor
-        #print(img)
-        #print(source)
-
+        
         # Run inference on the source
         results = model(source)  # list of Results objects
-        ##########################################
-
-        # # pass the image through the model
-        # with torch.no_grad():
-        #     output = model(img_tensor)
-
-        # # get the predicted class label
-        # _, predicted = torch.max(output.data, 1)
-        # label = predicted.item()
-        
-        #return jsonify({'class_label': label})
-        #return results[0].tojson()
         ###########################################################################################
         # Convert JSON string to dictionary
         results_dictionary = json.loads(results[0].tojson())
-        # Load an example PIL image
-        #image_path = "images.jpg"
-        #image = Image.open(image_path)
 
         # Draw bounding boxes on the image
         img_resized= img.resize((640,640))
         output_image = draw_bboxes_on_image(img_resized, results_dictionary)
-        
-        # Convert PIL image to bytes
-        #img_byte_array = io.BytesIO()
-        #output_image.save(img_byte_array, format='JPEG')  # Use 'PNG' if you prefer PNG format
-        #img_byte_array.seek(0)
-        
-        #img2_byte_array = io.BytesIO()
-        #img.save(img2_byte_array, format='JPEG')
-        #img2_byte_array.seek(0)
-        # Convert images to base64-encoded strings
-        
-       
+        ###########################################################################################       
         
         img1_base64 = image_to_base64(img_resized)
         img2_base64 = image_to_base64(output_image)
@@ -211,9 +180,9 @@ def upload_zip():
 
     # Create a MinIO client
     client = Minio(
-        "13.126.220.115:9000",
-        access_key="kZmyHyr1BvhE9pqi5pWu",
-        secret_key="m98OKv6KSpBVNqqsAg19Qa1ObFT0L0jdSFQyFHdp",
+        "<ENTER IP ADDRESS>:9000",
+        access_key="<ENTER KEY>",
+        secret_key="<ENTER KEY>",
         secure=False  # Set to False if not using https
     )
     if 'zipped_file' not in request.files:
@@ -239,15 +208,6 @@ def upload_zip():
         try:
             client.fput_object(bucket_name, object_name, temp_file_path)
             unzip_file(temp_file_path, "./data")
-
-            # Load a model
-            model = YOLO('yolov8n.yaml')  # build a new model from YAML
-            model = YOLO('yolov8n.pt')  # load a pretrained model (recommended for training)
-            model = YOLO('yolov8n.yaml').load('yolov8n.pt')  # build from YAML and transfer weights
-
-            # # Train the model
-            # results = model.train(data='./data/data.yaml',
-            #                     epochs=2, imgsz=640)
                     
             return jsonify({"message": f"File {object_name} uploaded successfully, training started"})
         except Exception as e:
